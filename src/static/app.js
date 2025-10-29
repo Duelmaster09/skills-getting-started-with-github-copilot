@@ -25,9 +25,33 @@ document.addEventListener("DOMContentLoaded", () => {
           <p>${details.description}</p>
           <p><strong>Schedule:</strong> ${details.schedule}</p>
           <p><strong>Availability:</strong> ${spotsLeft} spots left</p>
+
+          <!-- Participants section (populated below) -->
+          <div class="participants-section">
+            <h5 class="participants-header">Participants:</h5>
+            <ul class="participants-list">
+              <!-- items will be added here -->
+            </ul>
+          </div>
         `;
 
         activitiesList.appendChild(activityCard);
+
+        // Populate participants list
+        const participantsUl = activityCard.querySelector(".participants-list");
+        if (Array.isArray(details.participants) && details.participants.length > 0) {
+          details.participants.forEach((p) => {
+            const li = document.createElement("li");
+            // Show name part before @ if present, otherwise show full string
+            const displayName = typeof p === "string" && p.includes("@") ? p.split("@")[0] : String(p);
+            li.innerHTML = `<span class="participant-name">${escapeHtml(displayName)}</span>`;
+            participantsUl.appendChild(li);
+          });
+        } else {
+          const li = document.createElement("li");
+          li.innerHTML = `<span class="participant-empty">No participants yet</span>`;
+          participantsUl.appendChild(li);
+        }
 
         // Add option to select dropdown
         const option = document.createElement("option");
@@ -83,4 +107,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Initialize app
   fetchActivities();
+
+  // Small helper to avoid inserting raw HTML from participant strings
+  function escapeHtml(str) {
+    return str.replace(/&/g, "&amp;")
+              .replace(/</g, "&lt;")
+              .replace(/>/g, "&gt;")
+              .replace(/"/g, "&quot;")
+              .replace(/'/g, "&#039;");
+  }
 });
